@@ -1,36 +1,36 @@
-from flask import Flask, request, jsonify
+def calculate_risk(
+    bite_reports,
+    unvaccinated_percentage,
+    dog_density,
+    suspected_dogs
+):
 
-app = Flask(__name__)
+    risk_score = (
+        bite_reports * 0.35
+        + unvaccinated_percentage * 0.35
+        + dog_density * 0.15
+        + suspected_dogs * 0.15
+    )
 
-dogs = []
+    if risk_score >= 70:
+        risk_level = "HIGH"
 
-@app.route("/")
-def home():
-    return "RabiesGuard API Running"
+    elif risk_score >= 40:
+        risk_level = "MEDIUM"
 
-@app.route("/dogs", methods=["POST"])
-def add_dog():
-    data = request.json
+    else:
+        risk_level = "LOW"
 
-    dog = {
-        "rfid": data["rfid"],
-        "ward": data["ward"],
-        "vaccinated": data["vaccinated"],
-        "sterilized": data["sterilized"]
-    }
-
-    dogs.append(dog)
-
-    return jsonify({
-        "message": "Dog record added",
-        "dog": dog
-    }), 201
+    return risk_score, risk_level
 
 
-@app.route("/dogs", methods=["GET"])
-def get_dogs():
-    return jsonify(dogs)
+# Example
+score, level = calculate_risk(
+    bite_reports=20,
+    unvaccinated_percentage=60,
+    dog_density=30,
+    suspected_dogs=10
+)
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
+print("RabiesGuard Risk Score:", round(score, 2))
+print("Risk Level:", level)
