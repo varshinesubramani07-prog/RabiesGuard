@@ -1,0 +1,27 @@
+def calculate_risk(bites, unvaccinated, dog_density, suspected):
+    risk = (
+        bites * 0.35 +
+        unvaccinated * 0.35 +
+        dog_density * 0.15 +
+        suspected * 0.15
+    )
+
+    if risk >= 70:
+        level = "HIGH"
+    elif risk >= 40:
+        level = "MEDIUM"
+    else:
+        level = "LOW"
+
+    return risk, level
+
+
+risk, level = calculate_risk(
+    bites=20,
+    unvaccinated=60,
+    dog_density=30,
+    suspected=10
+)
+
+print("Risk Score:", risk)
+print("Risk Level:", level)
