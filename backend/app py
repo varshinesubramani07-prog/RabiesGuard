@@ -1,27 +1,75 @@
-def calculate_risk(bites, unvaccinated, dog_density, suspected):
-    risk = (
-        bites * 0.35 +
-        unvaccinated * 0.35 +
-        dog_density * 0.15 +
-        suspected * 0.15
-    )
+from flask import Flask, request, jsonify
 
-    if risk >= 70:
-        level = "HIGH"
-    elif risk >= 40:
-        level = "MEDIUM"
-    else:
-        level = "LOW"
+app = Flask(__name__)
 
-    return risk, level
+dogs = []
+bite_reports = []
 
 
-risk, level = calculate_risk(
-    bites=20,
-    unvaccinated=60,
-    dog_density=30,
-    suspected=10
-)
+@app.route("/")
+def home():
+    return jsonify({
+        "project": "RabiesGuard",
+        "status": "Backend is running"
+    })
 
-print("Risk Score:", risk)
-print("Risk Level:", level)
+
+# Add dog
+@app.route("/dogs", methods=["POST"])
+def add_dog():
+
+    data = request.json
+
+    dog = {
+        "rfid": data.get("rfid"),
+        "qr_code": data.get("qr_code"),
+        "ward": data.get("ward"),
+        "vaccinated": data.get("vaccinated", False),
+        "sterilized": data.get("sterilized", False),
+        "location": data.get("location")
+    }
+
+    dogs.append(dog)
+
+    return jsonify({
+        "message": "Dog record added successfully",
+        "dog": dog
+    }), 201
+
+
+# Get all dogs
+@app.route("/dogs", methods=["GET"])
+def get_dogs():
+    return jsonify(dogs)
+
+
+# Submit bite report
+@app.route("/bite-report", methods=["POST"])
+def bite_report():
+
+    data = request.json
+
+    report = {
+        "name": data.get("name"),
+        "phone": data.get("phone"),
+        "dog_id": data.get("dog_id"),
+        "location": data.get("location"),
+        "date": data.get("date")
+    }
+
+    bite_reports.append(report)
+
+    return jsonify({
+        "message": "Bite report submitted successfully",
+        "report": report
+    }), 201
+
+
+# Get bite reports
+@app.route("/bite-reports", methods=["GET"])
+def get_bite_reports():
+    return jsonify(bite_reports)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
